@@ -8,21 +8,16 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: self-hosted # Убедитесь, что здесь указано self-hosted для вашего сервера
 
     steps:
     - uses: actions/checkout@v4
 
-    # Автоматически ставим .NET 9, так как в логах видно, что ваш проект использует net9.0
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
+    # Шаг Setup .NET удален, так как он установлен глобально на сервере
 
     - name: Restore dependencies
       run: dotnet restore
 
-    # Публикуем конкретный проект игры, отключая сбойную оптимизацию размера (PublishTrimmed=false)
     - name: Publish Game
       run: |
         dotnet publish ./Game/Engine.csproj --configuration Release -p:PublishTrimmed=false --output ./publish
