@@ -60,6 +60,7 @@ namespace TowerDefecse
         private void SpawnPlayer(int[,] terrainTiles)
         {
             go = _scene.CreateGameObject("Player");
+            var core = _scene.CreateGameObject("Core");
             var tex = new Texture("D:\\engine\\Game\\Game\\Texture\\Player.png");
             var sprite = new Sprite(tex) { PixelsPerUnit = 32 };
             spriteRenderer = go.AddComponent<SpriteRenderer>();
@@ -77,7 +78,15 @@ namespace TowerDefecse
             go.Transform.Position = safeSpot;
             go.Transform.Scale = new Vector2(1, 1);
             spriteRenderer.Sprite = sprite;
-            spriteRenderer.SortingOrder = 5;
+            spriteRenderer.SortingOrder = 10;
+            //Core
+            var coreCom = core.AddComponent<Core>();
+            core.Transform.Position = safeSpot;
+            var spriteRendererCore = core.AddComponent<SpriteRenderer>();
+            var texCore = new Texture("D:\\engine\\Game\\Game\\Texture\\Core.png");
+            var spriteCore = new Sprite(texCore) { PixelsPerUnit = 32 };
+            spriteRendererCore.SortingOrder = 5;
+            spriteRendererCore.Sprite = spriteCore;
         }
 
         private Vector2 FindClosesestSafeSpot(int[,] terrainTiles)
