@@ -1,0 +1,44 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET Game Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Скачиваем исходный код репозитория
+    - uses: actions/checkout@v4
+
+    # 2. Настраиваем окружение .NET (измените 8.0.x на 9.0.x, если обновите проект)
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    # 3. Восстанавливаем NuGet-пакеты (включая OpenTK)
+    - name: Restore dependencies
+      run: dotnet restore
+
+    # 4. Собираем проект в режиме Release (оптимизация кода)
+    - name: Build Game
+      run: dotnet build --configuration Release --no-restore
+
+    # 5. Публикуем игру (собираем все нужные .dll и ресурсы в одну папку)
+    - name: Publish Game
+      run: dotnet publish --configuration Release --no-build --output ./publish
+
+    # 6. Загружаем готовую папку в GitHub Artifacts, чтобы её можно было скачать
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: game-build-linux
+        path: ./publish
+
