@@ -22,6 +22,8 @@ namespace TowerDefecse
         protected List<Enemy> enemiesInRange = new();
         protected Texture tex = null!;
         protected Sprite sprite = null!;
+        protected Texture gunTexture = null!;
+        protected GameObject weaponGO = null!;
 
         private float timeSinceLastAttack = 0f;
         //----------Events---------(Доступны для подписки извне, но не для вызова)
@@ -32,14 +34,27 @@ namespace TowerDefecse
         {
             AllInstances.Add(this);
             NewTowerBuild.Invoke();
+            
         }
         public override void Start()
         {
             AllEnemy = Enemy.AllInstances;
             tex = new Texture("D:\\engine\\Game\\Game\\Texture\\bulletBase.png");
             sprite = new Sprite(tex) { PixelsPerUnit = 32 };
+            Setup();
+            SpawnGun();
         }
-        protected void ChangeSpriteBullet()
+        protected virtual void Setup() { }
+        protected virtual void SpawnGun()
+        {
+            if (gunTexture == null) return;
+            weaponGO = GameObject.CreateChild("Weapon");
+            var _weaponRenderer = weaponGO.AddComponent<SpriteRenderer>();
+            var gunSprite = new Sprite(gunTexture) { PixelsPerUnit = 32 };
+            _weaponRenderer.Sprite = gunSprite;
+            _weaponRenderer.SortingOrder = 7;
+        }
+        protected void ChangeSprite()
         {
             sprite = new Sprite(tex) { PixelsPerUnit = 32 };
         }
@@ -57,22 +72,32 @@ namespace TowerDefecse
             else
             {
                 //Console.WriteLine(enemiesInRange.Count);
-                if(enemiesInRange.Count == 0)
+                if (enemiesInRange.Count == 0)
                 {
                     GetTarget();
                 }
                 else
                 {
-                    Attack();
-                    timeSinceLastAttack = 0f;
+                    if (RotateGun())
+                    {
+                        Attack();
+                        timeSinceLastAttack = 0f;
+                    }
                 }
             }
+        }
+        protected bool RotateGun()
+        {
+            var target = enemiesInRange[0];
+            Vector2 dir = target.Transform.Position - Transform.Position;
+            weaponGO.Transform.Rotation = MathF.Atan2(dir.Y, dir.X) - MathF.PI / 2;
+            return true;
         }
         protected virtual void GetTarget()
         {
             foreach (var enemy in AllEnemy)
             {
-                if(attackRange <= 0) break;
+                if (attackRange <= 0) break;
                 if ((enemy.Transform.Position - Transform.Position).Length <= attackRange)
                 {
                     if (!enemiesInRange.Contains(enemy))

@@ -91,12 +91,13 @@ public class Scene
     {
         if (_pendingAdd.Count > 0)
         {
-            foreach (var go in _pendingAdd)
+            var snapshot = _pendingAdd.ToArray();
+            _pendingAdd.Clear();
+            foreach (var go in snapshot)
             {
                 _gameObjects.Add(go);
                 go.Start();
             }
-            _pendingAdd.Clear();
         }
 
         if (_pendingRemove.Count > 0)

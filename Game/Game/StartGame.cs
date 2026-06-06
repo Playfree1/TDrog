@@ -24,11 +24,6 @@ namespace TowerDefecse
         public TileChunk _chunk = null!;
         private FlowFields? _flowFields;
         private bool _showDebug = true;
-
-        private static readonly Color4[] NumberColors =
-        {
-        new(0.75f, 0.75f, 0.75f, 1f),
-    };
         public StartGame(GameWindowSettings gs, NativeWindowSettings ns) : base(gs, ns) { }
         protected override void OnLoad()
         {
@@ -90,7 +85,7 @@ namespace TowerDefecse
             spriteRenderer.SortingOrder = 10;
             //Core
             var coreCom = core.AddComponent<Core>();
-            core.Transform.Position = safeSpot;
+            core.Transform.Position = new Vector2(safeSpot.X + 0.5f, safeSpot.Y + 0.5f);
             var spriteRendererCore = core.AddComponent<SpriteRenderer>();
             var texCore = new Texture("D:\\engine\\Game\\Game\\Texture\\Core.png");
             var spriteCore = new Sprite(texCore) { PixelsPerUnit = 32 };

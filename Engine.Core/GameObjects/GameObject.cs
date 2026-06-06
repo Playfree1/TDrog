@@ -104,6 +104,14 @@ public class GameObject
         }
     }
 
+    public GameObject CreateChild(string name)
+    {
+        var child = new GameObject(name);
+        child.Transform.SetParent(Transform);
+        Scene?.AddGameObject(child);
+        return child;
+    }
+
     public void Destroy()
     {
         if (_isDestroyed) return;

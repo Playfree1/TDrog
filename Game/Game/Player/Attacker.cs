@@ -45,7 +45,7 @@ namespace TowerDefecse
             bullet.Transform.Rotation = MathF.Atan2(direction.Y, direction.X) - MathF.PI / 2;
             var spriteRenderer = bullet.AddComponent<SpriteRenderer>();
             spriteRenderer.Sprite = sprite;
-            spriteRenderer.SortingOrder = 1;
+            spriteRenderer.SortingOrder = 10;
             var bulletComponent = bullet.AddComponent<Bullet>();
             bulletComponent.Setup(direction, 20f);
         }
