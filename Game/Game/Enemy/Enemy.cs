@@ -31,6 +31,7 @@ public class Enemy : Component
     protected Vector2 LastKnownPlayerPosition;
     protected FlowFields flowFields = null!;
     protected RandomF randomF = null!;
+    public bool isAttacking = false;
 
 
     //----------Events---------(Доступны для подписки извне, но не для вызова)
@@ -39,13 +40,14 @@ public class Enemy : Component
     public static event Action EnemyDie = delegate { };
     public static event Action<float> OnHitPlayer = delegate { };
     public static event Action EnemyAttack = delegate { };
-
+    public static event Action NewEnemySpawn = delegate { };
 
 
 
     //----------Methods---------
     public override void Awake()
     {
+        NewEnemySpawn.Invoke();
         AllInstances.Add(this);
     }
     public override void Start()
@@ -96,7 +98,7 @@ public class Enemy : Component
             Vector2 direction = (LastKnownPlayerPosition - Transform.Position).Normalized();
             Transform.Position += direction * speed * Time.DeltaTime;
         }
-        else
+        else if (isAttacking)
         {
             int tileX = (int)Math.Floor(Transform.Position.X);
             int tileY = (int)Math.Floor(Transform.Position.Y);

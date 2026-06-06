@@ -39,10 +39,12 @@ namespace TowerDefecse
 
             var terrainTiles = GenerateTerrain();
             var core = SpawnPlayer(terrainTiles);
-            
+
             _flowFields = new FlowFields();
             _flowFields.Setup(_chunk, 400, core);
             SpawnEnemy(terrainTiles, _flowFields);
+            var waveObj = _scene.CreateGameObject("WaveController");
+            waveObj.AddComponent<WaveController>();
             _scene.Load();
             LoadScene(_scene);
             GC.Collect();

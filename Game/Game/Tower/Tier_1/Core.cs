@@ -10,7 +10,7 @@ namespace TowerDefecse
             gunTexture = new Texture("D:\\engine\\Game\\Game\\Texture\\CoreGun.png");
             sprite = new Sprite(tex) { PixelsPerUnit = 32 };
             CanBeConstructed = false;
-            AttackSpeed = 0.001f;
+            AttackSpeed = 0.5f;
             AttackDamage = 40f;
             canAttackAir = true;
             canAttackGround = true;
