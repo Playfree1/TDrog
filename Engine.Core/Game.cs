@@ -116,11 +116,15 @@ public class Game : GameWindow
             }
         }
 
+        OnAfterRender();
+
         swRender.Stop();
         LastRenderUs = swRender.ElapsedTicks * 1_000_000 / Stopwatch.Frequency;
 
         SwapBuffers();
     }
+
+    protected virtual void OnAfterRender() { }
 
     protected override void OnResize(ResizeEventArgs e)
     {

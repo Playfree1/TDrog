@@ -15,6 +15,7 @@ public class SpriteChunk : Component, IDisposable
     {
         public Vector2 Position;
         public Vector2 Scale;
+        public float Rotation;
         public Color4 Color;
     }
 
@@ -38,7 +39,7 @@ public class SpriteChunk : Component, IDisposable
         _dirty = true;
     }
 
-    public void Add(Vector2 position, Vector2? scale = null, Color4? color = null)
+    public void Add(Vector2 position, Vector2? scale = null, Color4? color = null, float rotation = 0f)
     {
         if (_entries.Length <= _count)
             Array.Resize(ref _entries, Math.Max(64, _entries.Length * 2));
@@ -47,12 +48,13 @@ public class SpriteChunk : Component, IDisposable
         {
             Position = position,
             Scale = scale ?? DefaultScale,
+            Rotation = rotation,
             Color = color ?? Color4.White
         };
         _dirty = true;
     }
 
-    public void AddRange(Vector2[] positions, Vector2? scale = null, Color4? color = null)
+    public void AddRange(Vector2[] positions, Vector2? scale = null, Color4? color = null, float rotation = 0f)
     {
         var s = scale ?? DefaultScale;
         var c = color ?? Color4.White;
@@ -67,6 +69,7 @@ public class SpriteChunk : Component, IDisposable
             {
                 Position = positions[i],
                 Scale = s,
+                Rotation = rotation,
                 Color = c
             };
         }
@@ -123,14 +126,26 @@ public class SpriteChunk : Component, IDisposable
             var sx = e.Scale.X;
             var sy = e.Scale.Y;
 
-            float x0 = (-ox) * sx + px;
-            float y0 = (-oy) * sy + py;
-            float x1 = (w - ox) * sx + px;
-            float y1 = (-oy) * sy + py;
-            float x2 = (w - ox) * sx + px;
-            float y2 = (h - oy) * sy + py;
-            float x3 = (-ox) * sx + px;
-            float y3 = (h - oy) * sy + py;
+            float cosR = (float)Math.Cos(e.Rotation);
+            float sinR = (float)Math.Sin(e.Rotation);
+
+            float lx0 = (-ox) * sx;
+            float ly0 = (-oy) * sy;
+            float lx1 = (w - ox) * sx;
+            float ly1 = (-oy) * sy;
+            float lx2 = (w - ox) * sx;
+            float ly2 = (h - oy) * sy;
+            float lx3 = (-ox) * sx;
+            float ly3 = (h - oy) * sy;
+
+            float x0 = lx0 * cosR - ly0 * sinR + px;
+            float y0 = lx0 * sinR + ly0 * cosR + py;
+            float x1 = lx1 * cosR - ly1 * sinR + px;
+            float y1 = lx1 * sinR + ly1 * cosR + py;
+            float x2 = lx2 * cosR - ly2 * sinR + px;
+            float y2 = lx2 * sinR + ly2 * cosR + py;
+            float x3 = lx3 * cosR - ly3 * sinR + px;
+            float y3 = lx3 * sinR + ly3 * cosR + py;
 
             int idx = _vertexCount * VertexStride;
 

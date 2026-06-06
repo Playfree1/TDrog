@@ -6,6 +6,8 @@ using Engine.Core.GameObjects;
 using Engine.Core.Scene;
 using OpenTK.Windowing.Common;
 using Engine.Core.Mathematic;
+using Engine.Core.Pathfinding;
+using Engine.Core.Input;
 
 
 
@@ -20,6 +22,8 @@ namespace TowerDefecse
         private Camera _camera = null!;
         private SpriteRenderer spriteRenderer = null!;
         public TileChunk _chunk = null!;
+        private FlowFields? _flowFields;
+        private bool _showDebug = true;
 
         private static readonly Color4[] NumberColors =
         {
@@ -39,8 +43,11 @@ namespace TowerDefecse
             _scene = new Scene("Test Scene");
 
             var terrainTiles = GenerateTerrain();
-            SpawnPlayer(terrainTiles);
-            SpawnEnemy(terrainTiles);
+            var core = SpawnPlayer(terrainTiles);
+            
+            _flowFields = new FlowFields();
+            _flowFields.Setup(_chunk, 400, core);
+            SpawnEnemy(terrainTiles, _flowFields);
             _scene.Load();
             LoadScene(_scene);
             GC.Collect();
@@ -56,8 +63,10 @@ namespace TowerDefecse
                 time = 0f;
                 Title = $"FPS: {1f / args.Time:F2} | Upd: {Game.LastUpdateUs}us | Rend: {Game.LastRenderUs}us";
             }
+            if (Input.GetKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.F3))
+                _showDebug = !_showDebug;
         }
-        private void SpawnPlayer(int[,] terrainTiles)
+        private Vector2 SpawnPlayer(int[,] terrainTiles)
         {
             go = _scene.CreateGameObject("Player");
             var core = _scene.CreateGameObject("Core");
@@ -87,6 +96,7 @@ namespace TowerDefecse
             var spriteCore = new Sprite(texCore) { PixelsPerUnit = 32 };
             spriteRendererCore.SortingOrder = 5;
             spriteRendererCore.Sprite = spriteCore;
+            return safeSpot;
         }
 
         private Vector2 FindClosesestSafeSpot(int[,] terrainTiles)
@@ -223,7 +233,7 @@ namespace TowerDefecse
             _chunk = chunk;
             return tiles;
         }
-        private void SpawnEnemy(int[,] terrainTiles)
+        private void SpawnEnemy(int[,] terrainTiles, FlowFields flowFields)
         {
             var tex = new Texture("D:\\engine\\Game\\Game\\Texture\\Enemy.png");
             var sprite = new Sprite(tex) { PixelsPerUnit = 32 };
@@ -234,13 +244,18 @@ namespace TowerDefecse
                     {
                         var go = _scene.CreateGameObject($"Enemy_{x}_{y}");
                         var spriteRenderer = go.AddComponent<SpriteRenderer>();
-                        go.AddComponent<Enemy>();
+                        var enemy = go.AddComponent<Enemy>();
+                        enemy.flowField = flowFields;
                         go.Transform.Position = new Vector2(x, y);
                         go.Transform.Scale = new Vector2(1, 1);
                         spriteRenderer.Sprite = sprite;
                         spriteRenderer.SortingOrder = 5;
                     }
 
+        }
+        protected override void OnAfterRender()
+        {
+            //_flowFields?.DrawDebug(_camera);
         }
     }
 }

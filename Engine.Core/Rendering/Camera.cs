@@ -59,4 +59,19 @@ public class Camera
             Position.Y + ndcY * h * 0.5f
         );
     }
+
+    public Vector2 WorldToScreen(Vector2 worldPos)
+    {
+        var aspect = Renderer.ScreenWidth / (float)Renderer.ScreenHeight;
+        var h = Width / Zoom;
+        var w = h * aspect;
+
+        float ndcX = (worldPos.X - Position.X) / (w * 0.5f);
+        float ndcY = (worldPos.Y - Position.Y) / (h * 0.5f);
+
+        return new Vector2(
+            (ndcX + 1f) * Renderer.ScreenWidth * 0.5f,
+            (1f - ndcY) * Renderer.ScreenHeight * 0.5f
+        );
+    }
 }

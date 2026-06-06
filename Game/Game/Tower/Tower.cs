@@ -26,10 +26,12 @@ namespace TowerDefecse
         private float timeSinceLastAttack = 0f;
         //----------Events---------(Доступны для подписки извне, но не для вызова)
         public static event Action<Tower, Enemy> OnAttackEnemy = delegate { };
+        public static event Action NewTowerBuild = delegate { };
         //----------Methods---------
         public override void Awake()
         {
             AllInstances.Add(this);
+            NewTowerBuild.Invoke();
         }
         public override void Start()
         {
@@ -48,7 +50,7 @@ namespace TowerDefecse
                 if (!enemiesInRange[i].Enabled)
                     enemiesInRange.RemoveAt(i);
 
-            if (timeSinceLastAttack < attackSpeed)
+            if (timeSinceLastAttack <= attackSpeed)
             {
                 timeSinceLastAttack += dt;
             }
