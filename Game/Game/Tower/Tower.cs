@@ -43,7 +43,7 @@ namespace TowerDefecse
             sprite = new Sprite(tex) { PixelsPerUnit = 32 };
             Setup();
             SpawnGun();
-            Enemy.NewEnemySpawn += UpdateEnemy;
+            Enemy.EnemyCountChange += UpdateEnemy;
         }
         private void UpdateEnemy() => AllEnemy = Enemy.AllInstances;
         protected virtual void Setup() { }

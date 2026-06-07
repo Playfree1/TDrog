@@ -40,14 +40,14 @@ public class Enemy : Component
     public static event Action EnemyDie = delegate { };
     public static event Action<float> OnHitPlayer = delegate { };
     public static event Action EnemyAttack = delegate { };
-    public static event Action NewEnemySpawn = delegate { };
+    public static event Action EnemyCountChange = delegate { };
 
 
 
     //----------Methods---------
     public override void Awake()
     {
-        NewEnemySpawn.Invoke();
+        EnemyCountChange.Invoke();
         AllInstances.Add(this);
     }
     public override void Start()
@@ -169,6 +169,7 @@ public class Enemy : Component
     public override void OnDestroy()
     {
         AllInstances.Remove(this);
+        EnemyCountChange.Invoke();
     }
     public void ApplyDamage(float damage)
     {
