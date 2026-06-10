@@ -1,4 +1,6 @@
+using Engine.Core;
 using Engine.Core.GameObjects;
+using Engine.Core.Physics;
 using Engine.Core.Rendering;
 using OpenTK.Mathematics;
 
@@ -24,17 +26,20 @@ namespace TowerDefecse
         protected Sprite sprite = null!;
         protected Texture gunTexture = null!;
         protected GameObject weaponGO = null!;
+        protected float MaxHp = 100;
+        protected float CurrHP = 100;
 
         private float timeSinceLastAttack = 0f;
         //----------Events---------(Доступны для подписки извне, но не для вызова)
         public static event Action<Tower, Enemy> OnAttackEnemy = delegate { };
         public static event Action NewTowerBuild = delegate { };
+        public static event Action<Vector2> TowerDestroyed = delegate { };
         //----------Methods---------
         public override void Awake()
         {
             AllInstances.Add(this);
             NewTowerBuild.Invoke();
-            
+
         }
         public override void Start()
         {
@@ -44,6 +49,7 @@ namespace TowerDefecse
             Setup();
             SpawnGun();
             Enemy.EnemyCountChange += UpdateEnemy;
+            CurrHP = MaxHp;
         }
         private void UpdateEnemy() => AllEnemy = Enemy.AllInstances;
         protected virtual void Setup() { }
@@ -54,7 +60,7 @@ namespace TowerDefecse
             var _weaponRenderer = weaponGO.AddComponent<SpriteRenderer>();
             var gunSprite = new Sprite(gunTexture) { PixelsPerUnit = 32 };
             _weaponRenderer.Sprite = gunSprite;
-            _weaponRenderer.SortingOrder = 7;
+            _weaponRenderer.SortingOrder = 3;
         }
         protected void ChangeSprite()
         {
@@ -62,6 +68,7 @@ namespace TowerDefecse
         }
         public override void FixedUpdate(float dt)
         {
+
             // Чистим мёртвых врагов из списка
             for (int i = enemiesInRange.Count - 1; i >= 0; i--)
                 if (!enemiesInRange[i].Enabled)
@@ -87,6 +94,25 @@ namespace TowerDefecse
                     }
                 }
             }
+            foreach (var enemy in enemiesInRange)
+            {
+                if (enemy == null) continue;
+                if(enemy.CanAttack() == false) continue;
+                float distSq = (enemy.Transform.Position - Transform.Position).LengthSquared;
+                if (distSq > 4f) continue; // дальше 2 единиц — пропускаем
+
+                if (Collision.Overlaps(GameObject, enemy.GameObject))
+                {
+                    ApplyDamage(enemy.GetDamage());
+                    enemy.SuccesfulAttack();
+                }
+            }
+            if (CurrHP <= 0f) TowerDestroy();
+        }
+        protected virtual void ApplyDamage(float damage)
+        {
+            TowerDestroyed.Invoke(Transform.Position);
+            CurrHP -= damage;
         }
         protected bool RotateGun()
         {
@@ -115,6 +141,10 @@ namespace TowerDefecse
                     }
                 }
             }
+        }
+        protected virtual void TowerDestroy()
+        {
+            GameObject.Destroy();
         }
         protected virtual void Attack()
         {

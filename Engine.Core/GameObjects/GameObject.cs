@@ -15,6 +15,7 @@ public class GameObject
     {
         Name = name;
         Transform = new Transform();
+        Transform.GameObject = this;
     }
 
     public T AddComponent<T>() where T : Component, new()
@@ -117,6 +118,11 @@ public class GameObject
         if (_isDestroyed) return;
         _isDestroyed = true;
         Active = false;
+
+        // destroy children first
+        for (int i = Transform.Children.Count - 1; i >= 0; i--)
+            Transform.Children[i].GameObject.Destroy();
+        Transform.Children.Clear();
 
         for (int i = _components.Count - 1; i >= 0; i--)
         {

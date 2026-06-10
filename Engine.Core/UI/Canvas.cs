@@ -44,6 +44,19 @@ public class Canvas
         var pos = new Vector2(x + width * 0.5f, y + height * 0.5f);
         _batch!.Draw(sprite, pos, Vector2.One, 0f, c, new Vector2(0.5f), 0);
     }
+
+    public void DrawTextureRegion(Texture texture, float x, float y, float destWidth, float destHeight,
+        float srcX, float srcY, float srcWidth, float srcHeight, Color4? color = null)
+    {
+        EnsureInitialized();
+        var c = color ?? Color4.White;
+        var sprite = new Sprite(texture, new Box2(srcX, srcY, srcX + srcWidth, srcY + srcHeight))
+        {
+            PixelsPerUnit = srcWidth / destWidth
+        };
+        var pos = new Vector2(x + destWidth * 0.5f, y + destHeight * 0.5f);
+        _batch!.Draw(sprite, pos, Vector2.One, 0f, c, new Vector2(0.5f), 0);
+    }
     public void DrawWorldTextCentered(BitmapFont font, string text, Vector2 worldPos, Color4 color, float scale = 1f)
     {
         EnsureInitialized();

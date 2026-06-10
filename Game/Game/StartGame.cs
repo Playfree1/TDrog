@@ -91,7 +91,7 @@ namespace TowerDefecse
             var spriteRendererCore = core.AddComponent<SpriteRenderer>();
             var texCore = new Texture("D:\\engine\\Game\\Game\\Texture\\Core.png");
             var spriteCore = new Sprite(texCore) { PixelsPerUnit = 32 };
-            spriteRendererCore.SortingOrder = 5;
+            spriteRendererCore.SortingOrder = 2;
             spriteRendererCore.Sprite = spriteCore;
             return safeSpot;
         }
@@ -237,7 +237,7 @@ namespace TowerDefecse
             var rng = new Random();
             for (int x = 1; x < 399; x++)
                 for (int y = 1; y < 399; y++)
-                    if (IsSafeSpot(terrainTiles, x, y, 1) && rng.Next(0, 100) < 5 && (new Vector2(x, y) - new Vector2(200, 200)).Length > 20f)
+                    if (IsSafeSpot(terrainTiles, x, y, 1) && rng.Next(0, 100) < 9 && (new Vector2(x, y) - new Vector2(200, 200)).Length > 20f)
                     {
                         var go = _scene.CreateGameObject($"Enemy_{x}_{y}");
                         var spriteRenderer = go.AddComponent<SpriteRenderer>();
@@ -253,6 +253,7 @@ namespace TowerDefecse
         protected override void OnAfterRender()
         {
             //_flowFields?.DrawDebug(_camera);
+            base.OnAfterRender();
         }
     }
 }

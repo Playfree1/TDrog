@@ -70,6 +70,7 @@ public class TileChunk : Component, IDisposable
         return _tiles[ToIndex(x, y)];
     }
 
+    public bool IsSolidAt(Vector2 worldPos) => IsSolidAt(worldPos.X, worldPos.Y);
     public bool IsSolidAt(float worldX, float worldY)
         => IsSolidAt(worldX, worldY, SolidTiles);
 

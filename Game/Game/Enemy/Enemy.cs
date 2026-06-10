@@ -22,8 +22,8 @@ public class Enemy : Component
     protected float radiusOfView = 10f;
     protected float attackRange = 1f;
     protected float attackSpeed = 1;
-    protected float attackDamage = 10f;
-    protected float touchDamage = 5f;
+    private float timeSinceLastAttack = 0;
+    protected float attackDamage = 15f;
     protected float armoring = 0f;
     protected List<Tower> towers = null!;
     private GameObject player = null!;
@@ -32,6 +32,7 @@ public class Enemy : Component
     protected FlowFields flowFields = null!;
     protected RandomF randomF = null!;
     public bool isAttacking = false;
+    public bool mayAttackPlayerEvenIfAttakers = false;
 
 
     //----------Events---------(Доступны для подписки извне, но не для вызова)
@@ -45,6 +46,7 @@ public class Enemy : Component
 
 
     //----------Methods---------
+    public float GetDamage() => attackDamage;
     public override void Awake()
     {
         EnemyCountChange.Invoke();
@@ -64,6 +66,10 @@ public class Enemy : Component
     }
     public override void Update(float dt)
     {
+        if (timeSinceLastAttack < attackSpeed)
+        {
+            timeSinceLastAttack += dt;
+        }
         PassiveBehavior();
         if (TrySeePlayer())
         {
@@ -92,7 +98,7 @@ public class Enemy : Component
     protected virtual void PassiveBehavior() { }
     protected virtual void MoveToLastKnownPosition()
     {
-        if (LastKnownPlayerPosition != Vector2.Zero)
+        if (LastKnownPlayerPosition != Vector2.Zero && (!isAttacking || mayAttackPlayerEvenIfAttakers))
         {
             if ((Transform.Position - LastKnownPlayerPosition).Length <= 0.1f) { LastKnownPlayerPosition = Vector2.Zero; return; } // Уже на месте
             Vector2 direction = (LastKnownPlayerPosition - Transform.Position).Normalized();
@@ -117,7 +123,7 @@ public class Enemy : Component
                     // 4. Смешиваем направление из Flow Field и силу подтягивания к центру.
                     // Коэффициент 0.35f определяет, насколько сильно врага "магнитит" к центру дороги,
                     // чтобы он не срезал углы стен слишком сильно. Поэкспериментируйте с ним.
-                    Vector2 finalDirection = moveDirection + (toCenter * randomF.Range(0.35f,0.95f));
+                    Vector2 finalDirection = moveDirection + (toCenter * randomF.Range(0.35f, 0.95f));
 
                     // 5. Нормализуем итоговый вектор, чтобы скорость всегда была стабильной
                     if (finalDirection.LengthSquared > 0)
@@ -143,6 +149,7 @@ public class Enemy : Component
     /// <returns>Обязательное возвращение результата</returns>
     protected virtual bool TrySeePlayer()
     {
+        if (isAttacking && !mayAttackPlayerEvenIfAttakers) return false;
         Vector2 directionToPlayer = player.Transform.Position - Transform.Position;
         float distanceToPlayer = directionToPlayer.Length;
         if (distanceToPlayer > radiusOfView) return false; // Игрок вне радиуса видимости
@@ -164,7 +171,7 @@ public class Enemy : Component
     }
     protected virtual void EnemyTouchPlayer()
     {
-        OnHitPlayer.Invoke(Armor(TouchDamage) * Time.DeltaTime);
+        OnHitPlayer.Invoke(Armor(attackDamage) * Time.DeltaTime);
     }
     public override void OnDestroy()
     {
@@ -193,7 +200,15 @@ public class Enemy : Component
     {
         return damage * (1 - armoring);
     }
-
+    public bool CanAttack()
+    {
+        if (timeSinceLastAttack >= attackSpeed)
+        {
+            return true;
+        }
+        return false;
+    }
+    public void SuccesfulAttack() => timeSinceLastAttack = 0f; // Сбрасываем таймер при успешной проверке
 
     //----------Properties---------
     protected float Speed
@@ -230,11 +245,6 @@ public class Enemy : Component
     {
         get => attackDamage;
         set => attackDamage = value;
-    }
-    protected float TouchDamage
-    {
-        get => touchDamage;
-        set => touchDamage = value;
     }
     protected float Armoring
     {

@@ -4,6 +4,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using Engine.Core.UI;
 
 namespace Engine.Core;
 
@@ -14,6 +15,9 @@ public class Game : GameWindow
 
     public static long LastUpdateUs { get; private set; }
     public static long LastRenderUs { get; private set; }
+
+    private Canvas _uiCanvas = new();
+    public static event Action<Canvas>? OnDrawUI;
 
     public Game(GameWindowSettings gameSettings, NativeWindowSettings nativeSettings)
         : base(gameSettings, nativeSettings)
@@ -124,7 +128,12 @@ public class Game : GameWindow
         SwapBuffers();
     }
 
-    protected virtual void OnAfterRender() { }
+    protected virtual void OnAfterRender()
+    {
+        _uiCanvas.Begin();
+        OnDrawUI?.Invoke(_uiCanvas);
+        _uiCanvas.End();
+    }
 
     protected override void OnResize(ResizeEventArgs e)
     {

@@ -102,6 +102,7 @@ namespace TowerDefecse
 
             Direction = movementDirection;
             movementDirection = Vector2.Zero;
+            
         }
     }
 }

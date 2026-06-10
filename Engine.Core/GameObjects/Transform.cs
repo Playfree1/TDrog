@@ -10,6 +10,7 @@ public class Transform
 
     public Transform? Parent { get; set; }
     public List<Transform> Children { get; } = new();
+    public GameObject GameObject { get; internal set; } = null!;
 
 
 

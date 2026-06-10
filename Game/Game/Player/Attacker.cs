@@ -17,23 +17,32 @@ namespace TowerDefecse
         public Camera camera = null!;
         private Texture tex = null!;
         private Sprite sprite = null!;
+        SpawnTurret spawnTurret = null!;
         public override void Start()
         {
             tex = new Texture("D:\\engine\\Game\\Game\\Texture\\BulletBase.png");
             sprite = new Sprite(tex) { PixelsPerUnit = 32 };
+            spawnTurret = new SpawnTurret();
+            spawnTurret.scene = GameObject.Scene;
         }
+
         public override void Update(float dt)
         {
-            
+
             if (attackCooldown <= 0f)
             {
-                if(Input.GetMouseButton(0))
+                if (Input.GetMouseButton(0))
                 {
                     Attack();
                     attackCooldown = attackSpeed;
                 }
             }
             else attackCooldown -= dt;
+            if (Input.GetMouseButtonDown(1))
+            {
+                Vector2 worldPos = camera.ScreenToWorld(Input.MousePosition);
+                spawnTurret.SpawnTower(worldPos,SpawnTurret.TurretType.Cannon);
+            }
         }
         protected virtual void Attack()
         {

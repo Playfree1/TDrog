@@ -1,20 +1,24 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Engine.Core.Rendering;
 using OpenTK.Mathematics;
 
 namespace TowerDefecse
 {
-    public class Core : Tower
+    public class Cannon : Tower
     {
         protected override void Setup()
         {
             gunTexture = new Texture("D:\\engine\\Game\\Game\\Texture\\CoreGun.png");
             sprite = new Sprite(tex) { PixelsPerUnit = 32 };
-            CanBeConstructed = false;
-            AttackSpeed = 0.5f;
-            AttackDamage = 40f;
-            MaxHp = 1000;
-            CurrHP = 1000;
-            canAttackAir = true;
+            CanBeConstructed = true;
+            AttackSpeed = 0.85f;
+            AttackDamage = 15f;
+            MaxHp = 50;
+            CurrHP = 50;
+            canAttackAir = false;
             canAttackGround = true;
             ChangeSprite();
         }
