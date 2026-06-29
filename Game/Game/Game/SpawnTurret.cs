@@ -16,24 +16,33 @@ namespace TowerDefecse
         {
             Cannon = 0,
         }
+        
+
         public void SpawnTower(Vector2 spawnPosition, TurretType Type)
         {
             Inst();
+
+            if(turretPosition.Count > 100) return;
+
             spawnPosition = new Vector2(MathF.Floor(spawnPosition.X), MathF.Floor(spawnPosition.Y));
+
             if (turretPosition.Contains(spawnPosition)) return;
+
             turretPosition.Add(spawnPosition);
             var tower = scene.CreateGameObject(spawnPosition.ToString());
+
             if(tower == null) return;
-            if(tileChunk.IsSolidAt(spawnPosition) || turretPosition.Count > 100) return;
+            if(tileChunk.IsSolidAt(spawnPosition)) return;
+
+            tower.Transform.Position = new Vector2(spawnPosition.X + 0.5f, spawnPosition.Y + 0.5f);
+            var spriteRendererCore = tower.AddComponent<SpriteRenderer>();
+            spriteRendererCore.SortingOrder = 2;
             switch (Type)
             {
                 case TurretType.Cannon:
-                    var coreCom = tower.AddComponent<Cannon>();
-                    tower.Transform.Position = new Vector2(spawnPosition.X + 0.5f, spawnPosition.Y + 0.5f);
-                    var spriteRendererCore = tower.AddComponent<SpriteRenderer>();
+                    tower.AddComponent<Cannon>();
                     var texCore = new Texture("D:\\engine\\Game\\Game\\Texture\\Base.png");
                     var spriteCore = new Sprite(texCore) { PixelsPerUnit = 32 };
-                    spriteRendererCore.SortingOrder = 2;
                     spriteRendererCore.Sprite = spriteCore;
                     break;
             }

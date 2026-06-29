@@ -30,15 +30,31 @@ namespace TowerDefecse
         protected float CurrHP = 100;
 
         private float timeSinceLastAttack = 0f;
-        //----------Events---------(Доступны для подписки извне, но не для вызова)
+        //----------Events---------
         public static event Action<Tower, Enemy> OnAttackEnemy = delegate { };
-        public static event Action NewTowerBuild = delegate { };
+        public static event Action<Vector2> NewTowerBuild = delegate { };
         public static event Action<Vector2> TowerDestroyed = delegate { };
+        //----------Static Build---------
+        public static bool IsEnoughResources<T>() where T : Tower, new()
+        {
+            // создаём временный экземпляр, чтобы узнать цены
+            var temp = new T();
+            if (Resources.GetResource(Resources.Resource.wood) < temp.WoodCost) return false;
+            if (Resources.GetResource(Resources.Resource.rock) < temp.RockCost) return false;
+            if (Resources.GetResource(Resources.Resource.iron) < temp.IronCost) return false;
+
+            Resources.ChangeResources(Resources.Resource.wood, -temp.WoodCost);
+            Resources.ChangeResources(Resources.Resource.rock, -temp.RockCost);
+            Resources.ChangeResources(Resources.Resource.iron, -temp.IronCost);
+
+
+            return true;
+        }
         //----------Methods---------
         public override void Awake()
         {
             AllInstances.Add(this);
-            NewTowerBuild.Invoke();
+            NewTowerBuild.Invoke(Transform.Position);
 
         }
         public override void Start()
@@ -68,11 +84,13 @@ namespace TowerDefecse
         }
         public override void FixedUpdate(float dt)
         {
-
             // Чистим мёртвых врагов из списка
             for (int i = enemiesInRange.Count - 1; i >= 0; i--)
                 if (!enemiesInRange[i].Enabled)
                     enemiesInRange.RemoveAt(i);
+
+            // Всегда обновляем список врагов в радиусе
+            GetTarget();
 
             if (timeSinceLastAttack <= attackSpeed)
             {
@@ -80,12 +98,7 @@ namespace TowerDefecse
             }
             else
             {
-                //Console.WriteLine(enemiesInRange.Count);
-                if (enemiesInRange.Count == 0)
-                {
-                    GetTarget();
-                }
-                else
+                if (enemiesInRange.Count > 0)
                 {
                     if (RotateGun())
                     {
@@ -111,7 +124,6 @@ namespace TowerDefecse
         }
         protected virtual void ApplyDamage(float damage)
         {
-            TowerDestroyed.Invoke(Transform.Position);
             CurrHP -= damage;
         }
         protected bool RotateGun()
@@ -144,6 +156,8 @@ namespace TowerDefecse
         }
         protected virtual void TowerDestroy()
         {
+            TowerDestroyed.Invoke(Transform.Position);
+            AllInstances.Remove(this);
             GameObject.Destroy();
         }
         protected virtual void Attack()
@@ -165,22 +179,22 @@ namespace TowerDefecse
             bullet.Setup(direction, attackDamage);
         }
         //----------Properties---------
-        protected float AttackRange
+        public float AttackRange
         {
             get => attackRange;
             set => attackRange = value;
         }
-        protected float AttackDamage
+        public float AttackDamage
         {
             get => attackDamage;
             set => attackDamage = value;
         }
-        protected float AttackSpeed
+        public float AttackSpeed
         {
             get => attackSpeed;
             set => attackSpeed = value;
         }
-        protected int WoodCost
+        public int WoodCost
         {
             get => woodCost;
             set => woodCost = value;

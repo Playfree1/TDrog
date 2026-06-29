@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Engine.Core.Rendering;
 using OpenTK.Mathematics;
 
@@ -9,6 +5,10 @@ namespace TowerDefecse
 {
     public class Cannon : Tower
     {
+        public static int CostWood => 1;
+        public static int CostRock => 0;
+        public static int CostIron => 0;
+
         protected override void Setup()
         {
             gunTexture = new Texture("D:\\engine\\Game\\Game\\Texture\\CoreGun.png");

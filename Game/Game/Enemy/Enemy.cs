@@ -29,10 +29,10 @@ public class Enemy : Component
     private GameObject player = null!;
     private TileChunk tiles = null!;
     protected Vector2 LastKnownPlayerPosition;
-    protected FlowFields flowFields = null!;
-    protected RandomF randomF = null!;
+    protected FlowFields[] flowFields = null!;
     public bool isAttacking = false;
     public bool mayAttackPlayerEvenIfAttakers = false;
+    private int lookatfl = (int)RandomF.Range(0,3);
 
 
     //----------Events---------(Доступны для подписки извне, но не для вызова)
@@ -54,13 +54,12 @@ public class Enemy : Component
     }
     public override void Start()
     {
-        randomF = new RandomF();
         player = Player.Instance!.GameObject;
         tiles = GameObject.Scene!.FindObjectOfType<TileChunk>()!;
-        speed = speed * randomF.Range(0.85f, 1.25f);
+        speed = speed * RandomF.Range(0.85f, 1.25f);
         Tower.NewTowerBuild += UpdateTower;
     }
-    private void UpdateTower()
+    private void UpdateTower(Vector2 a)
     {
         towers = Tower.AllInstances;
     }
@@ -78,8 +77,6 @@ public class Enemy : Component
             if ((Transform.Position - player.Transform.Position).Length <= attackRange)
             {
                 Attack();
-                if (Collision.Overlaps(GameObject, player))
-                    EnemyTouchPlayer();
             }
             else
             {
@@ -109,7 +106,7 @@ public class Enemy : Component
             int tileX = (int)Math.Floor(Transform.Position.X);
             int tileY = (int)Math.Floor(Transform.Position.Y);
             Vector2 currentTile = new Vector2(tileX, tileY);
-            if (flowFields.GetFlowField().TryGetValue(currentTile, out Vector2 moveDirection))
+            if (flowFields[lookatfl].GetFlowField().TryGetValue(currentTile, out Vector2 moveDirection))
             {
                 // Если вектор нулевой (пришли к цели или стоим в стене), не двигаемся
                 if (moveDirection != Vector2.Zero)
@@ -123,7 +120,7 @@ public class Enemy : Component
                     // 4. Смешиваем направление из Flow Field и силу подтягивания к центру.
                     // Коэффициент 0.35f определяет, насколько сильно врага "магнитит" к центру дороги,
                     // чтобы он не срезал углы стен слишком сильно. Поэкспериментируйте с ним.
-                    Vector2 finalDirection = moveDirection + (toCenter * randomF.Range(0.35f, 0.95f));
+                    Vector2 finalDirection = moveDirection + (toCenter * RandomF.Range(0.35f, 0.95f));
 
                     // 5. Нормализуем итоговый вектор, чтобы скорость всегда была стабильной
                     if (finalDirection.LengthSquared > 0)
@@ -171,7 +168,7 @@ public class Enemy : Component
     }
     protected virtual void EnemyTouchPlayer()
     {
-        OnHitPlayer.Invoke(Armor(attackDamage) * Time.DeltaTime);
+        
     }
     public override void OnDestroy()
     {
@@ -251,7 +248,7 @@ public class Enemy : Component
         get => armoring;
         set => armoring = value;
     }
-    public FlowFields flowField
+        public FlowFields[] flowField
     {
         get => flowFields;
         set => flowFields = value;

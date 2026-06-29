@@ -5,6 +5,10 @@ namespace TowerDefecse
 {
     public class Core : Tower
     {
+        public static int CostWood => 0;
+        public static int CostRock => 0;
+        public static int CostIron => 0;
+
         protected override void Setup()
         {
             gunTexture = new Texture("D:\\engine\\Game\\Game\\Texture\\CoreGun.png");

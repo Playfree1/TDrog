@@ -23,7 +23,7 @@ namespace TowerDefecse
             tex = new Texture("D:\\engine\\Game\\Game\\Texture\\BulletBase.png");
             sprite = new Sprite(tex) { PixelsPerUnit = 32 };
             spawnTurret = new SpawnTurret();
-            spawnTurret.scene = GameObject.Scene;
+            spawnTurret.scene = GameObject.Scene!;
         }
 
         public override void Update(float dt)
@@ -41,6 +41,7 @@ namespace TowerDefecse
             if (Input.GetMouseButtonDown(1))
             {
                 Vector2 worldPos = camera.ScreenToWorld(Input.MousePosition);
+                if(Tower.IsEnoughResources<Cannon>())
                 spawnTurret.SpawnTower(worldPos,SpawnTurret.TurretType.Cannon);
             }
         }

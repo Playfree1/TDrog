@@ -40,11 +40,13 @@ namespace TowerDefecse
             var terrainTiles = GenerateTerrain();
             var core = SpawnPlayer(terrainTiles);
 
-            _flowFields = new FlowFields();
-            _flowFields.Setup(_chunk, 400, core);
-            SpawnEnemy(terrainTiles, _flowFields);
             var waveObj = _scene.CreateGameObject("WaveController");
-            waveObj.AddComponent<WaveController>();
+            var wave = waveObj.AddComponent<WaveController>();
+           
+            
+            SpawnEnemy(terrainTiles, wave.targetTurret);
+            
+            Resources.ChangeResources(Resources.Resource.wood,100);
             _scene.Load();
             LoadScene(_scene);
             GC.Collect();
@@ -60,8 +62,6 @@ namespace TowerDefecse
                 time = 0f;
                 Title = $"FPS: {1f / args.Time:F2} | Upd: {Game.LastUpdateUs}us | Rend: {Game.LastRenderUs}us";
             }
-            if (Input.GetKeyDown(OpenTK.Windowing.GraphicsLibraryFramework.Keys.F3))
-                _showDebug = !_showDebug;
         }
         private Vector2 SpawnPlayer(int[,] terrainTiles)
         {
@@ -230,7 +230,7 @@ namespace TowerDefecse
             _chunk = chunk;
             return tiles;
         }
-        private void SpawnEnemy(int[,] terrainTiles, FlowFields flowFields)
+        private void SpawnEnemy(int[,] terrainTiles, FlowFields[] flowFields)
         {
             var tex = new Texture("D:\\engine\\Game\\Game\\Texture\\Enemy.png");
             var sprite = new Sprite(tex) { PixelsPerUnit = 32 };

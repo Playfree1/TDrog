@@ -1,4 +1,7 @@
 using Engine.Core.GameObjects;
+using Engine.Core.Pathfinding;
+using Engine.Core.Rendering;
+using OpenTK.Mathematics;
 
 namespace TowerDefecse
 {
@@ -11,11 +14,24 @@ namespace TowerDefecse
         private int newAttakers = 5;
         private List<Enemy> enemies = new();
         private List<Enemy> attackers = new();
-
+        public FlowFields[] targetTurret = new FlowFields[3];
+        private FlowFields[] backgroundTurrets = new FlowFields[3] { new(), new(), new() };
+        private TileChunk chunk = null!;
+        private List<Tower> tower = null!;
+        private Dictionary<Tower, Vector2> position = new();
+        Random rnd = null!;
+        private bool isUpdatingFields = false;
         public override void Start()
         {
+            rnd = new Random();
+            targetTurret[0] = new FlowFields();
+            targetTurret[1] = new FlowFields();
+            targetTurret[2] = new FlowFields();
+            chunk = GameObject.Scene!.FindObjectOfType<TileChunk>()!;
             UpdateEnemy();
             Enemy.EnemyCountChange += UpdateEnemy;
+            Tower.TowerDestroyed += UpdateTarget;
+            Tower.NewTowerBuild += UpdateTarget;
         }
         private void UpdateEnemy()
         {
@@ -26,16 +42,44 @@ namespace TowerDefecse
             if (currentTime < waveRate) currentTime += dt;
             else
             {
-                Random rnd = new Random();
+
                 attackers = enemies.OrderBy(x => rnd.Next()).Take(attackersCount).ToList();
                 attackersCount += newAttakers;
                 currentTime = 0;
                 foreach (Enemy attaker in attackers)
                 {
                     attaker.isAttacking = true;
-                    attaker.mayAttackPlayerEvenIfAttakers = rnd.Next(2) == 1;;
+                    attaker.mayAttackPlayerEvenIfAttakers = rnd.Next(10) == 1;
                 }
             }
+        }
+        private async void UpdateTarget(Vector2 target)
+        {
+            if (isUpdatingFields) return;
+
+            tower = Tower.AllInstances;
+            if (tower.Count <= 3) return;
+            tower = tower.OrderBy(x => rnd.Next()).ToList();
+
+            isUpdatingFields = true;
+
+
+            var targetPositions = new Vector2[3];
+            for (int i = 0; i < 3; i++)
+            {
+                var firstTower = tower.First();
+                targetPositions[i] = firstTower.Transform.Position;
+                tower.Remove(firstTower);
+            }
+            await Task.Run(() =>
+            {
+                for (int i = 0; i < 3; i++)
+                    backgroundTurrets[i].Setup(chunk,400,targetPositions[i]);
+            });
+            var temp = targetTurret;
+            targetTurret = backgroundTurrets;
+            backgroundTurrets = temp;
+            isUpdatingFields = false;
         }
     }
 }
