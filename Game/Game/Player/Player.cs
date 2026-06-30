@@ -18,8 +18,8 @@ namespace TowerDefecse
         }
         //------------Fields------------
         protected float Speed { get; set; } = 4.5f;
-        protected float maxHealth = 100f;
-        protected float currentHealth = 100f;
+        protected float maxHealth = 500f;
+        protected float currentHealth = 500f;
 
         private const int HeartCount = 1;
         private const int HeartSize = 32;

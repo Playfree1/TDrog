@@ -8,6 +8,7 @@ public class Texture : IDisposable
     public int Handle { get; private set; }
     public int Width { get; private set; }
     public int Height { get; private set; }
+    public byte[] Data { get; private set; } = Array.Empty<byte>();
 
     public Texture(string path)
     {
@@ -19,6 +20,7 @@ public class Texture : IDisposable
 
         Width = image.Width;
         Height = image.Height;
+        Data = image.Data;
 
         CreateGlTexture(image.Data);
     }
@@ -27,6 +29,7 @@ public class Texture : IDisposable
     {
         Width = width;
         Height = height;
+        Data = data;
         CreateGlTexture(data);
     }
 

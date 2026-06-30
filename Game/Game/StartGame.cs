@@ -8,6 +8,7 @@ using OpenTK.Windowing.Common;
 using Engine.Core.Mathematic;
 using Engine.Core.Pathfinding;
 using Engine.Core.Input;
+using Engine.Core.Animation;
 
 
 
@@ -22,8 +23,6 @@ namespace TowerDefecse
         private Camera _camera = null!;
         private SpriteRenderer spriteRenderer = null!;
         public TileChunk _chunk = null!;
-        private FlowFields? _flowFields;
-        private bool _showDebug = true;
         public StartGame(GameWindowSettings gs, NativeWindowSettings ns) : base(gs, ns) { }
         protected override void OnLoad()
         {
@@ -44,9 +43,9 @@ namespace TowerDefecse
             var wave = waveObj.AddComponent<WaveController>();
            
             
-            SpawnEnemy(terrainTiles, wave.targetTurret);
+            //SpawnEnemy(terrainTiles, wave.targetTurret);
             
-            Resources.ChangeResources(Resources.Resource.wood,100);
+            Resources.ChangeResources(Resources.Resource.wood,150);
             _scene.Load();
             LoadScene(_scene);
             GC.Collect();
@@ -67,11 +66,36 @@ namespace TowerDefecse
         {
             go = _scene.CreateGameObject("Player");
             var core = _scene.CreateGameObject("Core");
-            var tex = new Texture("D:\\engine\\Game\\Game\\Texture\\Player.png");
-            var sprite = new Sprite(tex) { PixelsPerUnit = 32 };
+
+            var bodyTex = new Texture("D:\\engine\\Game\\Game\\Texture\\Units\\CoreSpider.png");
+            var legTex = new Texture("D:\\engine\\Game\\Game\\Texture\\Units\\SpiderCoreLeg.png");
+
             spriteRenderer = go.AddComponent<SpriteRenderer>();
+            spriteRenderer.SortingOrder = 10;
+
             var mover = go.AddComponent<Mover>();
             mover.chunk = _chunk;
+
+            var spiderConfig = new SpiderConfig(bodyTex, legTex)
+            {
+                Size = 32,
+                BodyRadiusWorld = 0.25f,
+                LegCount = 6,
+                SegmentsPerLeg = 2,
+                LegSegmentLength = 0.4f,
+                FootRadialOffset = 0.7f,
+                LegAnglesDegrees = new float[] { 45f, 0f, -45f, 135f, 180f, -135f },
+                StepThreshold = 0.08f,
+                SwingDuration = 0.09f,
+                RotationSpeed = 10f,
+                StepHeight = 0.04f,
+                MaxReachFactor = 1.5f,
+                ForwardFootOffset = 0f,
+                DebugMode = true,
+            };
+
+            var legAnim = go.AddComponent<SpiderLegAnimator>();
+            legAnim.Config = spiderConfig;
             var cameraMover = go.AddComponent<CameraMover>();
             var attacker = go.AddComponent<Attacker>();
             attacker.camera = _camera;
@@ -83,8 +107,6 @@ namespace TowerDefecse
             _camera.Position = safeSpot;
             go.Transform.Position = safeSpot;
             go.Transform.Scale = new Vector2(1, 1);
-            spriteRenderer.Sprite = sprite;
-            spriteRenderer.SortingOrder = 10;
             //Core
             var coreCom = core.AddComponent<Core>();
             core.Transform.Position = new Vector2(safeSpot.X + 0.5f, safeSpot.Y + 0.5f);

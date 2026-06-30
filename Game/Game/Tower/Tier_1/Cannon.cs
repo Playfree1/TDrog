@@ -16,8 +16,8 @@ namespace TowerDefecse
             CanBeConstructed = true;
             AttackSpeed = 0.85f;
             AttackDamage = 15f;
-            MaxHp = 50;
-            CurrHP = 50;
+            MaxHp = 150;
+            CurrHP = 150;
             canAttackAir = false;
             canAttackGround = true;
             ChangeSprite();

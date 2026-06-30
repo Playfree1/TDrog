@@ -238,14 +238,14 @@ void main()
 
             if (hasRotation)
             {
-                px0 = data.Position.X + (x0 * cos - y0 * sin) * data.Scale.X;
-                py0 = data.Position.Y + (x0 * sin + y0 * cos) * data.Scale.Y;
-                px1 = data.Position.X + (x1 * cos - y1 * sin) * data.Scale.X;
-                py1 = data.Position.Y + (x1 * sin + y1 * cos) * data.Scale.Y;
-                px2 = data.Position.X + (x2 * cos - y2 * sin) * data.Scale.X;
-                py2 = data.Position.Y + (x2 * sin + y2 * cos) * data.Scale.Y;
-                px3 = data.Position.X + (x3 * cos - y3 * sin) * data.Scale.X;
-                py3 = data.Position.Y + (x3 * sin + y3 * cos) * data.Scale.Y;
+                px0 = data.Position.X + (x0 * data.Scale.X * cos - y0 * data.Scale.Y * sin);
+                py0 = data.Position.Y + (x0 * data.Scale.X * sin + y0 * data.Scale.Y * cos);
+                px1 = data.Position.X + (x1 * data.Scale.X * cos - y1 * data.Scale.Y * sin);
+                py1 = data.Position.Y + (x1 * data.Scale.X * sin + y1 * data.Scale.Y * cos);
+                px2 = data.Position.X + (x2 * data.Scale.X * cos - y2 * data.Scale.Y * sin);
+                py2 = data.Position.Y + (x2 * data.Scale.X * sin + y2 * data.Scale.Y * cos);
+                px3 = data.Position.X + (x3 * data.Scale.X * cos - y3 * data.Scale.Y * sin);
+                py3 = data.Position.Y + (x3 * data.Scale.X * sin + y3 * data.Scale.Y * cos);
             }
             else
             {

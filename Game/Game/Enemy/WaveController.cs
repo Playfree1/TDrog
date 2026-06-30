@@ -8,13 +8,13 @@ namespace TowerDefecse
     public class WaveController : Component
     {
         protected int wave = 0;
-        protected float waveRate = 4;
+        protected float waveRate = 30;
         protected float currentTime = 0;
-        private int attackersCount = 1;
-        private int newAttakers = 5;
+        private int attackersCount = 5;
+        private int newAttakers = 3;
         private List<Enemy> enemies = new();
         private List<Enemy> attackers = new();
-        public FlowFields[] targetTurret = new FlowFields[3];
+        public FlowFields[] targetTurret = new FlowFields[3]{ new(), new(), new() };
         private FlowFields[] backgroundTurrets = new FlowFields[3] { new(), new(), new() };
         private TileChunk chunk = null!;
         private List<Tower> tower = null!;
@@ -24,9 +24,6 @@ namespace TowerDefecse
         public override void Start()
         {
             rnd = new Random();
-            targetTurret[0] = new FlowFields();
-            targetTurret[1] = new FlowFields();
-            targetTurret[2] = new FlowFields();
             chunk = GameObject.Scene!.FindObjectOfType<TileChunk>()!;
             UpdateEnemy();
             Enemy.EnemyCountChange += UpdateEnemy;
@@ -42,7 +39,6 @@ namespace TowerDefecse
             if (currentTime < waveRate) currentTime += dt;
             else
             {
-
                 attackers = enemies.OrderBy(x => rnd.Next()).Take(attackersCount).ToList();
                 attackersCount += newAttakers;
                 currentTime = 0;
